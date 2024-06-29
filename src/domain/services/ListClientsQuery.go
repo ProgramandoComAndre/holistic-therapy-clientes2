@@ -14,10 +14,10 @@ func NewListClientsQuery(clientRepository repositories.ClientRepository) *ListCl
 	}
 }
 
-func (ccf *ListClientsQuery) Execute(page int, limit int) (*entities.PaginatedClients, error) {
+func (ccf *ListClientsQuery) Execute(page int, limit int, username string) (*entities.PaginatedClients, error) {
 	repository := ccf.clientRepository
 
-	client, err := repository.GetClients(limit, page)
+	client, err := repository.GetClients(limit, page, username)
 	if err != nil {
 		return nil, err
 	}

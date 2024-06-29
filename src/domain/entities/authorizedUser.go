@@ -32,5 +32,6 @@ func (user *AuthorizedUser) CreateClient(createClientRequest CreateClientRequest
 		Address: createClientRequest.Address,
 		Diseases: createClientRequest.Diseases,
 		OtherInfo: createClientRequest.OtherInfo,
+		TherapistsAccess: []string{ user.Username },
 	} , nil
 }

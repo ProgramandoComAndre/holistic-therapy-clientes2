@@ -68,7 +68,7 @@ func (cc *ClientController) CreateClient(w http.ResponseWriter, r *http.Request)
 
 func (cc *ClientController) GetClients(w http.ResponseWriter, r *http.Request) {
 
-	_, ok := r.Context().Value("AuthorizedUser").(*entities.AuthorizedUser)
+	authorizedUser, ok := r.Context().Value("AuthorizedUser").(*entities.AuthorizedUser)
 	if !ok {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusUnauthorized)
@@ -92,7 +92,7 @@ func (cc *ClientController) GetClients(w http.ResponseWriter, r *http.Request) {
 
 	
 	
-	client, err := cc.ListClientsQuery.Execute(pageConverted,limitConverted)
+	client, err := cc.ListClientsQuery.Execute(pageConverted,limitConverted, authorizedUser.Username)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

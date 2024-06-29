@@ -2,20 +2,24 @@ package main
 
 import (
 	"context"
-	 "net/http" // import gorilla/mux
-	 "github.com/gorilla/mux"
-
-	"github.com/ProgramandoComAndre/holistic-therapy-clientes2/src/infra/repositories"
+	"net/http" // import gorilla/mux
+	"os"
 	r "github.com/ProgramandoComAndre/holistic-therapy-clientes2/src/domain/repositories"
 	"github.com/ProgramandoComAndre/holistic-therapy-clientes2/src/domain/services"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"github.com/ProgramandoComAndre/holistic-therapy-clientes2/src/infra/http/controllers"
 	"github.com/ProgramandoComAndre/holistic-therapy-clientes2/src/infra/middlewares"
+	"github.com/ProgramandoComAndre/holistic-therapy-clientes2/src/infra/repositories"
+	"github.com/gorilla/mux"
+	"github.com/joho/godotenv"
+	"github.com/rs/cors"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func main() {
-	mongoURI:= "mongodb://localhost:27017"
+	err := godotenv.Load(".env")
+ 	
+	mongoURI:= os.Getenv("MONGO_URI")
 
 	clientOptions := options.Client().ApplyURI(mongoURI)
 	mongoConnection, err := mongo.Connect(context.Background(), clientOptions)
@@ -32,10 +36,15 @@ func main() {
 	clientsController := controllers.NewClientController(createClientFileCommand, listClientsQuery)
 
 	r := mux.NewRouter()
+
+	
+	
 	r.Use(middlewares.AuthMiddleware)
 	r.HandleFunc("/clients", clientsController.CreateClient).Methods("POST")
 	r.HandleFunc("/clients", clientsController.GetClients).Methods("GET")
-	http.ListenAndServe(":8080", r)
-
+	handler := cors.AllowAll().Handler(r)
+	http.ListenAndServe(":3004", handler)
+	println("Listening on port 3004")
 
 }
+

@@ -42,6 +42,7 @@ type Client struct {
 	Address string
 	Diseases string
 	OtherInfo string
+	TherapistsAccess []string
 }
 
 

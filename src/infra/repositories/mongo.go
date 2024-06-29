@@ -35,7 +35,9 @@ func (r *MongoClientRepository) CreateClient(client *entities.Client) (*entities
 		Address:     client.Address,
 		Diseases:    client.Diseases,
 		OtherInfo:   client.OtherInfo,
+		TherapistsAccess: client.TherapistsAccess,
 	}
+
 
 	newClient.ID = result.InsertedID.(primitive.ObjectID).Hex() //result.InsertedID.(string)
 
@@ -51,14 +53,17 @@ func (r *MongoClientRepository) GetClientById(id string) (*entities.Client, erro
 	return &client, nil
 }
 
-func (r *MongoClientRepository) GetClients(limit int, page int) (*entities.PaginatedClients, error) {
+func (r *MongoClientRepository) GetClients(limit int, page int, username string) (*entities.PaginatedClients, error) {
 	var clients []entities.Client
 	clients = make([]entities.Client, 0)
 	l := int64(limit)
 	skip := int64(page * limit - limit)
 	fOpt := options.FindOptions { Limit: &l, Skip: &skip }
 
-	cursor, err := r.clientCollection.Find(context.Background(), bson.D{}, &fOpt)
+	filter := bson.M{"therapistsaccess": bson.M{"$in": []string{username}}}
+
+
+	cursor, err := r.clientCollection.Find(context.Background(), filter, &fOpt)
 	if err != nil {
 		return nil, err
 	}
